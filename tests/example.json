@@ -1,0 +1,537 @@
+{
+    "result": true,
+    "library": {
+        "trash": {
+            "0": [
+                "Trash"
+            ],
+            "map": {
+                "name": 0,
+                "tracks": 1
+            }
+        },
+        "tags": {
+            "123": {
+                "name": "Test Tag",
+                "archived": false,
+                "tracks": [
+                    357343232
+                ]
+            }
+        },
+        "tracks": {
+            "357343232": [
+                11,
+                1990,
+                "Goodbye & Good Riddance To Bad Luck",
+                "Rock",
+                194,
+                167310559,
+                530142,
+                40380386,
+                0,
+                "2023-12-24",
+                false,
+                7196039,
+                "Users/robsonke/Music/Music/Media.localized/Music/AC_DC/The Razor's Edge",
+                "",
+                0,
+                0,
+                "/128/347/967/273224834",
+                "audio/mp4",
+                "-6",
+                "13:28:07",
+                [
+                    [
+                        40380390,
+                        null,
+                        "composer"
+                    ]
+                ],
+                [],
+                "jBXXxpHk"
+            ],
+            "357343236": [
+                6,
+                1990,
+                "Rock Your Heart Out",
+                "Rock",
+                247,
+                167310559,
+                530142,
+                40380386,
+                0,
+                "2023-12-24",
+                false,
+                5933990,
+                "Users/robsonke/Music/Music/Media.localized/Music/AC_DC/The Razor's Edge",
+                "",
+                0,
+                0,
+                "/128/9e6/ebc/273224838",
+                "audio/mpeg",
+                "-3",
+                "13:28:09",
+                [],
+                [],
+                "jNk80jQJ"
+            ],
+            "357343241": [
+                5,
+                1990,
+                "Mistress For Christmas",
+                "Rock",
+                240,
+                167310559,
+                530142,
+                40380386,
+                0,
+                "2023-12-24",
+                false,
+                8827834,
+                "Users/robsonke/Music/Music/Media.localized/Music/AC_DC/The Razor's Edge",
+                "",
+                0,
+                0,
+                "/128/27f/9ab/273224842",
+                "audio/mp4",
+                "-6.2",
+                "13:28:11",
+                [
+                    [
+                        40380390,
+                        null,
+                        "composer"
+                    ]
+                ],
+                [],
+                "nZVUm97T"
+            ],
+            "357343244": [
+                10,
+                1990,
+                "Lets Make It",
+                "Rock",
+                213,
+                167310559,
+                530142,
+                40380386,
+                0,
+                "2023-12-24",
+                false,
+                5108307,
+                "Users/robsonke/Music/Music/Media.localized/Music/AC_DC/The Razor's Edge",
+                "",
+                0,
+                0,
+                "/128/cf0/db2/273224845",
+                "audio/mpeg",
+                "-1.1",
+                "13:28:13",
+                [],
+                [],
+                "KP0mqNR2"
+            ],
+            "357343247": [
+                3,
+                1990,
+                "Money Talks",
+                "Rock",
+                226,
+                167310559,
+                530142,
+                40380386,
+                0,
+                "2023-12-24",
+                false,
+                8222572,
+                "Users/robsonke/Music/Music/Media.localized/Music/AC_DC/The Razor's Edge",
+                "",
+                0,
+                0,
+                "/128/00b/589/273224850",
+                "audio/mp4",
+                "-7.2",
+                "13:28:16",
+                [
+                    [
+                        40380390,
+                        null,
+                        "composer"
+                    ]
+                ],
+                [],
+                "BN062XCy"
+            ],
+            "357343252": [
+                1,
+                1990,
+                "Thunderstruck",
+                "Rock",
+                293,
+                167310559,
+                530142,
+                40380386,
+                0,
+                "2023-12-24",
+                false,
+                10761996,
+                "Users/robsonke/Music/Music/Media.localized/Music/AC_DC/The Razor's Edge",
+                "",
+                0,
+                0,
+                "/128/57c/faf/273224852",
+                "audio/mp4",
+                "-6.1",
+                "13:28:18",
+                [
+                    [
+                        40380390,
+                        null,
+                        "composer"
+                    ]
+                ],
+                [],
+                "oC5oIeao"
+            ],
+            "357343264": [
+                9,
+                1990,
+                "Shot Of Love",
+                "Rock",
+                237,
+                167310559,
+                530142,
+                40380386,
+                0,
+                "2023-12-24",
+                false,
+                8723187,
+                "Users/robsonke/Music/Music/Media.localized/Music/AC_DC/The Razor's Edge",
+                "",
+                0,
+                0,
+                "/128/d3c/68b/273224864",
+                "audio/mp4",
+                "-6.3",
+                "13:28:25",
+                [
+                    [
+                        40380390,
+                        null,
+                        "composer"
+                    ]
+                ],
+                [],
+                "HN74DRKn"
+            ],
+            "357343268": [
+                2,
+                1990,
+                "Fire Your Guns",
+                "Rock",
+                174,
+                167310559,
+                530142,
+                40380386,
+                0,
+                "2023-12-24",
+                false,
+                6652339,
+                "Users/robsonke/Music/Music/Media.localized/Music/AC_DC/The Razor's Edge",
+                "",
+                0,
+                0,
+                "/128/d14/5fc/273224867",
+                "audio/mp4",
+                "-6.7",
+                "13:28:27",
+                [
+                    [
+                        40380390,
+                        null,
+                        "composer"
+                    ]
+                ],
+                [],
+                "N7bJsW9x"
+            ],
+            "357343280": [
+                4,
+                1990,
+                "The Razor's Edge",
+                "Rock",
+                263,
+                167310559,
+                530142,
+                40380386,
+                0,
+                "2023-12-24",
+                false,
+                9445125,
+                "Users/robsonke/Music/Music/Media.localized/Music/AC_DC/The Razor's Edge",
+                "",
+                0,
+                0,
+                "/128/0ef/f12/273224878",
+                "audio/mp4",
+                "-7.1",
+                "13:28:33",
+                [
+                    [
+                        40380390,
+                        null,
+                        "composer"
+                    ]
+                ],
+                [],
+                "n88UMfZ5"
+            ],
+            "357343284": [
+                12,
+                1990,
+                "If You Dare",
+                "Rock",
+                199,
+                167310559,
+                530142,
+                40380386,
+                0,
+                "2023-12-24",
+                false,
+                7052351,
+                "Users/robsonke/Music/Music/Media.localized/Music/AC_DC/The Razor's Edge",
+                "",
+                0,
+                0,
+                "/128/a47/079/273224880",
+                "audio/mp4",
+                "-7.2",
+                "13:28:37",
+                [
+                    [
+                        40380390,
+                        null,
+                        "composer"
+                    ]
+                ],
+                [],
+                "LlezzOT8"
+            ],
+            "357343298": [
+                7,
+                1990,
+                "Are You Ready",
+                "Rock",
+                251,
+                167310559,
+                530142,
+                40380386,
+                0,
+                "2023-12-24",
+                false,
+                9196421,
+                "Users/robsonke/Music/Music/Media.localized/Music/AC_DC/The Razor's Edge",
+                "",
+                0,
+                0,
+                "/128/a59/991/273224892",
+                "audio/mp4",
+                "-6.6",
+                "13:28:51",
+                [
+                    [
+                        40380390,
+                        null,
+                        "composer"
+                    ]
+                ],
+                [],
+                "LlqmnHrj"
+            ],
+            "357343301": [
+                8,
+                1990,
+                "Got You By The Balls",
+                "Rock",
+                271,
+                167310559,
+                530142,
+                40380386,
+                0,
+                "2023-12-24",
+                false,
+                9689934,
+                "Users/robsonke/Music/Music/Media.localized/Music/AC_DC/The Razor's Edge",
+                "",
+                0,
+                0,
+                "/128/13f/1bf/273224896",
+                "audio/mp4",
+                "-6.6",
+                "13:28:52",
+                [
+                    [
+                        40380390,
+                        null,
+                        "composer"
+                    ]
+                ],
+                [],
+                "OCEiAioG"
+            ],
+            "map": {
+                "trashed": 10,
+                "track": 0,
+                "artists_additional_map": {
+                    "type": 2,
+                    "phrase": 1,
+                    "artist_id": 0
+                },
+                "type": 17,
+                "genre": 3,
+                "year": 1,
+                "enid": 8,
+                "uploaded_time": 19,
+                "length": 4,
+                "size": 11,
+                "uid": 13,
+                "path": 12,
+                "artwork_id": 6,
+                "artists_additional": 20,
+                "album_id": 5,
+                "uploaded_on": 9,
+                "rating": 14,
+                "title": 2,
+                "artist_id": 7,
+                "icatid": 22,
+                "genres_additional": 21,
+                "plays": 15,
+                "file": 16,
+                "replay_gain": 18
+            }
+        },
+        "artists": {
+            "40380386": [
+                "AC/DC",
+                [
+                    357343191,
+                    357343194,
+                    357343195,
+                    357343202,
+                    357343203,
+                    357343206,
+                    357343208,
+                    357343212,
+                    357343217,
+                    357343222,
+                    357343224,
+                    357343226,
+                    357343232,
+                    357343235,
+                    357343236,
+                    357343241,
+                    357343244,
+                    357343247,
+                    357343252,
+                    357343259,
+                    357343264,
+                    357343268,
+                    357343280,
+                    357343284,
+                    357343298,
+                    357343301
+                ],
+                false,
+                0,
+                "17125192",
+                "MPhRLnB5"
+            ],
+            "40380390": [
+                "A. Young/M. Young",
+                [],
+                false,
+                0
+            ],
+            "map": {
+                "tracks": 1,
+                "trashed": 2,
+                "artwork_id": 4,
+                "rating": 3,
+                "name": 0,
+                "icatid": 5
+            }
+        },
+        "albums": {
+            "167310559": [
+                "The Razor's Edge",
+                [
+                    357343232,
+                    357343236,
+                    357343241,
+                    357343244,
+                    357343247,
+                    357343252,
+                    357343264,
+                    357343268,
+                    357343280,
+                    357343284,
+                    357343298,
+                    357343301
+                ],
+                40380386,
+                false,
+                0,
+                1,
+                1990,
+                [
+                    [
+                        40380390,
+                        null,
+                        "composer"
+                    ]
+                ],
+                "nxYHLZWZ"
+            ],
+            "map": {
+                "year": 6,
+                "name": 0,
+                "artists_additional": 7,
+                "artists_additional_map": {
+                    "type": 2,
+                    "artist_id": 0,
+                    "phrase": 1
+                },
+                "tracks": 1,
+                "rating": 4,
+                "icatid": 8,
+                "disc": 5,
+                "trashed": 3,
+                "artist_id": 2
+            }
+        },
+        "playlists": { },
+        "expires": 1756125427
+    },
+    "settings": {
+        "artwork_server": "https://artwork.ibroadcast.com",
+        "librarysongspersecond": 4000,
+        "slow_polling": 300,
+        "fast_polling": 30,
+        "streaming_server": "https://streaming.ibroadcast.com",
+        "librarybytespersong": 150
+    },
+    "status": {
+        "lastmodified": "2024-09-16 14:11:23",
+        "app_available": false,
+        "expires": "2024-09-08 12:37:07.000000",
+        "timestamp": "2024-08-25 12:37:07",
+        "app_version": "6.5"
+    },
+    "lastfm": {
+        "message": "Not connected",
+        "linked": false,
+        "sessionkey": "",
+        "user": ""
+    }
+}
