@@ -40,7 +40,6 @@ poetry run python -m unittest discover -s tests
 ```
 
 
-
 ## Data Structures
 
 For a very short and simplified example of the complete library JSON that the API provides, see [example.json](./example.json). Below you will find the fields of each main topic.
@@ -129,6 +128,3 @@ For a very short and simplified example of the complete library JSON that the AP
     "artist_id": 2
 }
 ```
-```
-
-Made changes.

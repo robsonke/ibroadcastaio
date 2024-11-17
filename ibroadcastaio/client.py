@@ -1,12 +1,20 @@
 import json
-from aiohttp import ClientSession
 from typing import Any, AsyncGenerator
-import logging
 
-from ibroadcastaio.const import BASE_API_URL, BASE_LIBRARY_URL, REFERER, STATUS_API, VERSION
+from aiohttp import ClientSession
+
+from ibroadcastaio.const import (
+    BASE_API_URL,
+    BASE_LIBRARY_URL,
+    REFERER,
+    STATUS_API,
+    VERSION,
+)
+
 
 class IBroadcastClient:
     """iBroadcast API Client to use the API in an async manner"""
+
     _user_id = None
     _token = None
 
@@ -22,7 +30,7 @@ class IBroadcastClient:
         self.http_session = http_session
 
     async def login(self, username: str, password: str) -> dict[str, Any]:
-        data={
+        data = {
             "mode": "status",
             "email_address": username,
             "password": password,
@@ -31,7 +39,9 @@ class IBroadcastClient:
             "supported_types": False,
         }
 
-        status = await self.__post(f"{BASE_API_URL}{STATUS_API}", { "content_type": "application/json" }, data)
+        status = await self.__post(
+            f"{BASE_API_URL}{STATUS_API}", {"content_type": "application/json"}, data
+        )
         if "user" not in status:
             raise ValueError("Invalid credentials")
 
@@ -57,16 +67,40 @@ class IBroadcastClient:
             For now we fetch the complete librady and split it into in memory class members.
             Later, we remove this step and rewrite methods such as _get_albums(album_id) to directly fetch it from the API.
         """
-        library = await self.__post(f"{BASE_LIBRARY_URL}", { "content_type": "application/json" }, data)
+        library = await self.__post(
+            f"{BASE_LIBRARY_URL}", {"content_type": "application/json"}, data
+        )
 
-        self._albums = {album['album_id']: album async for album in self.__jsonToDict(library['library']['albums'], 'album_id')}
-        self._artists = {artist['artist_id']: artist async for artist in self.__jsonToDict(library['library']['artists'], 'artist_id')}
-        self._playlists = {playlist['playlist_id']: playlist async for playlist in self.__jsonToDict(library['library']['playlists'], 'playlist_id')}
-        self._tags = {tag['tag_id']: tag async for tag in self.__jsonToDict(library['library']['tags'], 'tag_id')}
-        self._tracks = {track['track_id']: track async for track in self.__jsonToDict(library['library']['tracks'], 'track_id')}
+        self._albums = {
+            album["album_id"]: album
+            async for album in self.__jsonToDict(
+                library["library"]["albums"], "album_id"
+            )
+        }
+        self._artists = {
+            artist["artist_id"]: artist
+            async for artist in self.__jsonToDict(
+                library["library"]["artists"], "artist_id"
+            )
+        }
+        self._playlists = {
+            playlist["playlist_id"]: playlist
+            async for playlist in self.__jsonToDict(
+                library["library"]["playlists"], "playlist_id"
+            )
+        }
+        self._tags = {
+            tag["tag_id"]: tag
+            async for tag in self.__jsonToDict(library["library"]["tags"], "tag_id")
+        }
+        self._tracks = {
+            track["track_id"]: track
+            async for track in self.__jsonToDict(
+                library["library"]["tracks"], "track_id"
+            )
+        }
 
-        self._settings = library['settings']
-
+        self._settings = library["settings"]
 
     async def get_settings(self):
         self._check_library_loaded()
@@ -76,13 +110,20 @@ class IBroadcastClient:
         self._check_library_loaded()
         return self._albums.get(album_id)
 
-
-    async def __post(self, url: str, headers: dict[str, Any] | None = None, data: dict[str, Any] | None = None):
-        async with self.http_session.post(url=url, data=json.dumps(data), headers=headers) as response:
+    async def __post(
+        self,
+        url: str,
+        headers: dict[str, Any] | None = None,
+        data: dict[str, Any] | None = None,
+    ):
+        async with self.http_session.post(
+            url=url, data=json.dumps(data), headers=headers
+        ) as response:
             return await response.json()
 
-
-    async def __jsonToDict(self, data: list[dict[str, Any]], main_key: str) -> AsyncGenerator[dict[str, Any], None]:
+    async def __jsonToDict(
+        self, data: list[dict[str, Any]], main_key: str
+    ) -> AsyncGenerator[dict[str, Any], None]:
         """
         Convert the library json into python dicts. See the readme for all fields.
 
@@ -138,10 +179,10 @@ class IBroadcastClient:
             }
         }
         """
-        if not 'map' in data or type(data['map']) is not dict:
+        if "map" not in data or type(data["map"]) is not dict:
             return
 
-        keymap = {v: k for (k, v) in data['map'].items() if not isinstance(v, dict)}
+        keymap = {v: k for (k, v) in data["map"].items() if not isinstance(v, dict)}
 
         for key, value in data.items():
             if type(value) is list:
