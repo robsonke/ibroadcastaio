@@ -77,22 +77,33 @@ class IBroadcastClient:
                 library["library"]["albums"], "album_id"
             )
         }
+
         self._artists = {
             artist["artist_id"]: artist
             async for artist in self.__jsonToDict(
                 library["library"]["artists"], "artist_id"
             )
         }
+
         self._playlists = {
             playlist["playlist_id"]: playlist
             async for playlist in self.__jsonToDict(
                 library["library"]["playlists"], "playlist_id"
             )
         }
-        self._tags = {
-            tag["tag_id"]: tag
-            async for tag in self.__jsonToDict(library["library"]["tags"], "tag_id")
-        }
+
+        """See here the exception for tags: https://devguide.ibroadcast.com/?p=library#get-library"""
+        if isinstance(library["library"]["tags"], dict):
+            self._tags = {
+                int(tag_id): {**tag, "tag_id": int(tag_id)}
+                for tag_id, tag in library["library"]["tags"].items()
+            }
+        else:
+            self._tags = {
+                tag["tag_id"]: tag
+                async for tag in self.__jsonToDict(library["library"]["tags"], "tag_id")
+            }
+
         self._tracks = {
             track["track_id"]: track
             async for track in self.__jsonToDict(
@@ -102,6 +113,42 @@ class IBroadcastClient:
 
         self._settings = library["settings"]
 
+    async def get_album_art(self, album_id: int) -> str:
+        self._check_library_loaded()
+        album = self._albums.get(album_id)
+        if not album:
+            raise ValueError(f"Album with id {album_id} not found")
+
+        artwork_id = album.get("artwork_id")
+        if not artwork_id:
+            raise ValueError(f"No artwork found for album with id {album_id}")
+
+        base_url = self.get_artwork_base_url
+        return f"{base_url}/{artwork_id}"
+
+    async def get_artwork_base_url(self) -> str:
+        self._check_library_loaded()
+        base_url = self._settings.get("artwork_server")
+        if not base_url:
+            raise ValueError("Artwork base URL not found in settings")
+        return base_url
+
+    async def get_artist(self, artist_id: int):
+        self._check_library_loaded()
+        return self._artists.get(artist_id)
+
+    async def get_artists(self):
+        self._check_library_loaded()
+        return self._artists
+
+    async def get_tag(self, tag_id: int):
+        self._check_library_loaded()
+        return self._tags.get(tag_id)
+
+    async def get_tags(self):
+        self._check_library_loaded()
+        return self._tags
+
     async def get_settings(self):
         self._check_library_loaded()
         return self._settings
@@ -109,6 +156,26 @@ class IBroadcastClient:
     async def get_album(self, album_id: int):
         self._check_library_loaded()
         return self._albums.get(album_id)
+
+    async def get_albums(self):
+        self._check_library_loaded()
+        return self._albums
+
+    async def get_track(self, track_id: int):
+        self._check_library_loaded()
+        return self._tracks.get(track_id)
+
+    async def get_tracks(self):
+        self._check_library_loaded()
+        return self._tracks
+
+    async def get_playlist(self, playlist_id: int):
+        self._check_library_loaded()
+        return self._playlists.get(playlist_id)
+
+    async def get_playlists(self):
+        self._check_library_loaded()
+        return self._playlists
 
     async def __post(
         self,

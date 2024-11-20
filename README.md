@@ -39,10 +39,27 @@ To run the unit tests:
 poetry run python -m unittest discover -s tests
 ```
 
+## Example Usage
+
+### Initialize the client and fetch albums
+
+```python
+from ibroadcastaio import iBroadcastClient
+from aiohttp import ClientSession
+
+async with ClientSession() as session:
+    client = IBroadcastClient(session)
+    await client._login("your@email.com", "andyourpassword")
+    albums = await client._get_albums()
+    for album in albums:
+        print(album['name'])
+```
+
+
 
 ## Data Structures
 
-For a very short and simplified example of the complete library JSON that the API provides, see [example.json](./example.json). Below you will find the fields of each main topic.
+For a very short and simplified example of the complete library JSON that the API provides, see [example.json](./tests/example.json). Below you will find the fields of each main topic.
 
 ### Tracks
 

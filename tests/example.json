@@ -510,7 +510,37 @@
                 "artist_id": 2
             }
         },
-        "playlists": { },
+        "playlists": {
+            "1234": [
+                "Recently Played",
+                [
+                    357343232,
+                    357343236,
+                    357343241,
+                    357343244,
+                    357343247,
+                    357343252
+                ],
+                1234,
+                false,
+                "bcbJZAF9fv8",
+                "recently-played",
+                null,
+                null,
+                0
+            ],
+            "map": {
+                "public_id": 4,
+                "uid": 2,
+                "sort": 8,
+                "system_created": 3,
+                "artwork_id": 7,
+                "type": 5,
+                "tracks": 1,
+                "name": 0,
+                "description": 6
+            }
+        },
         "expires": 1756125427
     },
     "settings": {
