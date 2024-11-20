@@ -39,9 +39,15 @@ class IBroadcastClient:
             "supported_types": False,
         }
 
-        status = await self.__post(
-            f"{BASE_API_URL}{STATUS_API}", {"content_type": "application/json"}, data
-        )
+        try:
+            status = await self.__post(
+                f"{BASE_API_URL}{STATUS_API}",
+                {"content_type": "application/json"},
+                data,
+            )
+        except Exception as e:
+            raise ValueError(f"Failed to login: {e}")
+
         if "user" not in status:
             raise ValueError("Invalid credentials")
 
