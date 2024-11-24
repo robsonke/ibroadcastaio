@@ -12,6 +12,7 @@ class TestIBroadcastClient(unittest.IsolatedAsyncioTestCase):
     async def asyncSetUp(self):
         self.session = ClientSession()
         self.client = IBroadcastClient(self.session)
+        self.client._status = {"user": {"token": "fake_token", "id": "fake_id"}}
 
     async def asyncTearDown(self):
         await self.session.close()
@@ -34,8 +35,8 @@ class TestIBroadcastClient(unittest.IsolatedAsyncioTestCase):
     async def test_login_success(self, mock_post):
         mock_post.return_value = {"user": {"token": "fake_token", "id": "fake_id"}}
         result = await self.client.login("test@example.com", "password")
-        self.assertEqual(self.client._token, "fake_token")
-        self.assertEqual(self.client._user_id, "fake_id")
+        self.assertEqual(self.client._status["user"]["token"], "fake_token")
+        self.assertEqual(self.client._status["user"]["id"], "fake_id")
         self.assertIn("user", result)
 
     @patch(
@@ -303,6 +304,158 @@ class TestIBroadcastClient(unittest.IsolatedAsyncioTestCase):
         await self.client.refresh_library()
         with self.assertRaises(ValueError):
             await self.client.get_artwork_base_url()
+
+    @patch(
+        "ibroadcastaio.client.IBroadcastClient._IBroadcastClient__post",
+        new_callable=AsyncMock,
+    )
+    async def test_get_stream_url(self, mock_post):
+        mock_library = await self._load_raw_mock_library()
+        mock_post.return_value = mock_library
+
+        await self.client.refresh_library()
+        stream_url = await self.client.get_stream_url()
+
+        self.assertIsInstance(stream_url, str)
+        self.assertEqual(stream_url, mock_library["settings"]["streaming_server"])
+
+    @patch(
+        "ibroadcastaio.client.IBroadcastClient._IBroadcastClient__post",
+        new_callable=AsyncMock,
+    )
+    async def test_get_stream_url_not_found(self, mock_post):
+        mock_library = await self._load_raw_mock_library()
+        mock_library["settings"].pop("streaming_server", None)
+        mock_post.return_value = mock_library
+
+        await self.client.refresh_library()
+        with self.assertRaises(ValueError):
+            await self.client.get_stream_url()
+
+    @patch(
+        "ibroadcastaio.client.IBroadcastClient.get_artwork_url",
+        new_callable=AsyncMock,
+    )
+    async def test_get_track_artwork_url(self, mock_get_artwork_url):
+        track_id = 123
+        expected_url = "http://example.com/artwork/123-300"
+        mock_get_artwork_url.return_value = expected_url
+
+        result = await self.client.get_track_artwork_url(track_id)
+
+        self.assertEqual(result, expected_url)
+        mock_get_artwork_url.assert_awaited_once_with(track_id, "track")
+
+    @patch(
+        "ibroadcastaio.client.IBroadcastClient.get_artwork_url",
+        new_callable=AsyncMock,
+    )
+    async def test_get_track_artwork_url_no_artwork(self, mock_get_artwork_url):
+        track_id = 123
+        mock_get_artwork_url.side_effect = ValueError(
+            "No artwork found for track with id 123"
+        )
+
+        with self.assertRaises(ValueError):
+            await self.client.get_track_artwork_url(track_id)
+        mock_get_artwork_url.assert_awaited_once_with(track_id, "track")
+
+    @patch(
+        "ibroadcastaio.client.IBroadcastClient.get_artist",
+        new_callable=AsyncMock,
+    )
+    @patch(
+        "ibroadcastaio.client.IBroadcastClient.get_artwork_base_url",
+        new_callable=AsyncMock,
+    )
+    @patch(
+        "ibroadcastaio.client.IBroadcastClient._check_library_loaded",
+        new_callable=AsyncMock,
+    )
+    async def test_get_artwork_url_artist(
+        self, mock_check_library_loaded, mock_get_artwork_base_url, mock_get_artist
+    ):
+        mock_get_artwork_base_url.return_value = "http://example.com"
+        mock_get_artist.return_value = {"artist_id": 1, "artwork_id": 123}
+        mock_check_library_loaded.return_value = True
+
+        result = await self.client.get_artwork_url(1, "artist")
+
+        self.assertEqual(result, "http://example.com/artwork/123-300")
+        mock_get_artwork_base_url.assert_awaited_once()
+        mock_get_artist.assert_awaited_once_with(1)
+
+    @patch(
+        "ibroadcastaio.client.IBroadcastClient.get_playlist",
+        new_callable=AsyncMock,
+    )
+    @patch(
+        "ibroadcastaio.client.IBroadcastClient.get_artwork_base_url",
+        new_callable=AsyncMock,
+    )
+    @patch(
+        "ibroadcastaio.client.IBroadcastClient._check_library_loaded",
+        new_callable=AsyncMock,
+    )
+    async def test_get_artwork_url_playlist(
+        self, mock_check_library_loaded, mock_get_artwork_base_url, mock_get_playlist
+    ):
+        mock_get_artwork_base_url.return_value = "http://example.com"
+        mock_get_playlist.return_value = {"playlist_id": 1, "artwork_id": 123}
+        mock_check_library_loaded.return_value = True
+
+        result = await self.client.get_artwork_url(1, "playlist")
+
+        self.assertEqual(result, "http://example.com/artwork/123-300")
+        mock_get_artwork_base_url.assert_awaited_once()
+        mock_get_playlist.assert_awaited_once_with(1)
+
+    @patch(
+        "ibroadcastaio.client.IBroadcastClient.get_track",
+        new_callable=AsyncMock,
+    )
+    @patch(
+        "ibroadcastaio.client.IBroadcastClient.get_artwork_base_url",
+        new_callable=AsyncMock,
+    )
+    @patch(
+        "ibroadcastaio.client.IBroadcastClient._check_library_loaded",
+        new_callable=AsyncMock,
+    )
+    async def test_get_artwork_url_track(
+        self, mock_check_library_loaded, mock_get_artwork_base_url, mock_get_track
+    ):
+        mock_get_artwork_base_url.return_value = "http://example.com"
+        mock_get_track.return_value = {"track_id": 1, "artwork_id": 123}
+        mock_check_library_loaded.return_value = True
+
+        result = await self.client.get_artwork_url(1, "track")
+
+        self.assertEqual(result, "http://example.com/artwork/123-300")
+        mock_get_artwork_base_url.assert_awaited_once()
+        mock_get_track.assert_awaited_once_with(1)
+
+    async def test_get_artwork_url_invalid_entity_type(self):
+        with self.assertRaises(ValueError):
+            await self.client.get_artwork_url(1, "invalid_type")
+
+    @patch(
+        "ibroadcastaio.client.IBroadcastClient.get_artist",
+        new_callable=AsyncMock,
+    )
+    @patch(
+        "ibroadcastaio.client.IBroadcastClient._check_library_loaded",
+        new_callable=AsyncMock,
+    )
+    async def test_get_artwork_url_no_artwork(
+        self, mock_check_library_loaded, mock_get_artist
+    ):
+        mock_get_artist.return_value = {"artist_id": 1}
+        mock_check_library_loaded.return_value = True
+
+        with self.assertRaises(ValueError):
+            await self.client.get_artwork_url(1, "artist")
+        mock_get_artist.assert_awaited_once_with(1)
 
 
 if __name__ == "__main__":

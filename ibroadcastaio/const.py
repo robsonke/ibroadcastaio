@@ -6,4 +6,3 @@ BASE_LIBRARY_URL = "https://library.ibroadcast.com"
 STATUS_API = "/s/JSON/status"
 
 REFERER = "ibroadcastaio-client"
-VERSION = "0.1.0"

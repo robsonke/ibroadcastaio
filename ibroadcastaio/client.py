@@ -1,46 +1,41 @@
+import importlib.metadata
 import json
 from typing import Any, AsyncGenerator
 
 from aiohttp import ClientSession
 
-from ibroadcastaio.const import (
-    BASE_API_URL,
-    BASE_LIBRARY_URL,
-    REFERER,
-    STATUS_API,
-    VERSION,
-)
+from ibroadcastaio.const import BASE_API_URL, BASE_LIBRARY_URL, REFERER, STATUS_API
 
 
 class IBroadcastClient:
     """iBroadcast API Client to use the API in an async manner"""
-
-    _user_id = None
-    _token = None
 
     _albums = None
     _artists = None
     _playlists = None
     _tags = None
     _tracks = None
+
     _settings = None
+    _status = None
 
     def __init__(self, http_session: ClientSession) -> None:
         """Main constructor"""
         self.http_session = http_session
 
     async def login(self, username: str, password: str) -> dict[str, Any]:
+        """Login to the iBroadcast API and return the status dict"""
         data = {
             "mode": "status",
             "email_address": username,
             "password": password,
-            "version": VERSION,
+            "version": self.get_version(),
             "client": REFERER,
             "supported_types": False,
         }
 
         try:
-            status = await self.__post(
+            self._status = await self.__post(
                 f"{BASE_API_URL}{STATUS_API}",
                 {"content_type": "application/json"},
                 data,
@@ -48,22 +43,30 @@ class IBroadcastClient:
         except Exception as e:
             raise ValueError(f"Failed to login: {e}")
 
-        if "user" not in status:
+        if "user" not in self._status:
             raise ValueError("Invalid credentials")
 
-        # Store the token and user id
-        self._token = status["user"]["token"]
-        self._user_id = status["user"]["id"]
+        # result: Bool
+        # authenticated: Bool
+        # token: String
+        # status: Dictionary
+        # user: Dictionary
+        # settings: Dictionary
+        # status["user"]["token"]
+        # status["user"]["id"]
 
-        return status
+        return self._status
+
+    def get_version(self) -> str:
+        return importlib.metadata.version("ibroadcastaio")
 
     async def refresh_library(self):
         """Fetch the library to cache it locally"""
         data = {
-            "_token": self._token,
-            "_userid": self._user_id,
+            "_token": self._status["user"]["token"],
+            "_userid": self._status["user"]["id"],
             "client": REFERER,
-            "version": VERSION,
+            "version": self.get_version(),
             "mode": "library",
             "supported_types": False,
         }
@@ -119,18 +122,53 @@ class IBroadcastClient:
 
         self._settings = library["settings"]
 
-    async def get_album_art(self, album_id: int) -> str:
+    async def get_artwork_url(self, entity_id: int, entity_type: str) -> str:
         self._check_library_loaded()
-        album = self._albums.get(album_id)
-        if not album:
-            raise ValueError(f"Album with id {album_id} not found")
 
-        artwork_id = album.get("artwork_id")
-        if not artwork_id:
-            raise ValueError(f"No artwork found for album with id {album_id}")
+        if entity_type == "track":
+            entity = await self.get_track(entity_id)
+        elif entity_type == "artist":
+            entity = await self.get_artist(entity_id)
+        elif entity_type == "playlist":
+            entity = await self.get_playlist(entity_id)
+        else:
+            raise ValueError(f"Unsupported entity type: {entity_type}")
 
-        base_url = self.get_artwork_base_url
-        return f"{base_url}/{artwork_id}"
+        if not entity:
+            raise ValueError(
+                f"{entity_type.capitalize()} with id {entity_id} not found"
+            )
+
+        if "artwork_id" not in entity:
+            raise ValueError(f"No artwork found for {entity_type} with id {entity_id}")
+
+        artwork_id = entity["artwork_id"]
+
+        base_url = await self.get_artwork_base_url()
+
+        return f"{base_url}/artwork/{artwork_id}-300"
+
+    async def get_album_artwork_url(self, album_id: int) -> str:
+        """Get the artwork URL for an album from the first track in the album with a valid artwork_id"""
+
+        track_id = next(
+            (
+                track_id
+                for track_id in self.get_album(album_id)["tracks"]
+                if self._client.get_track(track_id)["artwork_id"] is not None
+            ),
+            None,
+        )
+        return await self.get_track_artwork_url(track_id)
+
+    async def get_track_artwork_url(self, track_id: int) -> str:
+        return await self.get_artwork_url(track_id, "track")
+
+    async def get_artist_artwork_url(self, artist_id: int) -> str:
+        return await self.get_artwork_url(artist_id, "artist")
+
+    async def get_playlist_artwork_url(self, playlist_id: int) -> str:
+        return await self.get_artwork_url(playlist_id, "playlist")
 
     async def get_artwork_base_url(self) -> str:
         self._check_library_loaded()
@@ -138,6 +176,27 @@ class IBroadcastClient:
         if not base_url:
             raise ValueError("Artwork base URL not found in settings")
         return base_url
+
+    async def get_stream_url(self) -> str:
+        self._check_library_loaded()
+        stream_url = self._settings.get("streaming_server")
+        if not stream_url:
+            raise ValueError("Stream server not found in settings")
+        return stream_url
+
+    async def get_full_stream_url(
+        self, track_id: int, platform: str = "ibroadcastaio"
+    ) -> str:
+        track = self.get_track(track_id)
+
+        return (
+            f'{self.get_stream_url()}{track["file"]}?'
+            f'&Signature={self._status["user"]["token"]}'
+            f"&file_id={track_id}"
+            f'&user_id={self._status["user"]["id"]}'
+            f"&platform={platform}"
+            f"&version={self.get_version()}"
+        )
 
     async def get_artist(self, artist_id: int):
         self._check_library_loaded()

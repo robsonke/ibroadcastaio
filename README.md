@@ -44,18 +44,36 @@ poetry run python -m unittest discover -s tests
 ### Initialize the client and fetch albums
 
 ```python
-from ibroadcastaio import iBroadcastClient
+from ibroadcastaio import IBroadcastClient
 from aiohttp import ClientSession
 
 async with ClientSession() as session:
     client = IBroadcastClient(session)
-    await client._login("your@email.com", "andyourpassword")
-    albums = await client._get_albums()
+    await client.login("your@email.com", "andyourpassword")
+    await client.refresh_library()
+
+    albums = await client.get_albums()
     for album in albums:
         print(album['name'])
 ```
 
+## Status object
+The login() method returns a status object which contains valuable data. Just print the status object to get a good understanding, but these are the main fields:
 
+```json
+{
+   "messages":[ ],
+   "message":"ok",
+   "dropbox":{ },
+   "lastfm":{ },
+   "googledrive":{ },
+   "settings":{ },
+   "status":{ },
+   "authenticated":true,
+   "result":true,
+   "user":{ }
+}
+```
 
 ## Data Structures
 
