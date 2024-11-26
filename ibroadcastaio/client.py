@@ -151,14 +151,10 @@ class IBroadcastClient:
     async def get_album_artwork_url(self, album_id: int) -> str:
         """Get the artwork URL for an album from the first track in the album with a valid artwork_id"""
 
-        track_id = next(
-            (
-                track_id
-                for track_id in self.get_album(album_id)["tracks"]
-                if self._client.get_track(track_id)["artwork_id"] is not None
-            ),
-            None,
-        )
+        track_id = None
+        for track_id in (await self.get_album(album_id))["tracks"]:
+            if (await self.get_track(track_id))["artwork_id"] is not None:
+                break
         return await self.get_track_artwork_url(track_id)
 
     async def get_track_artwork_url(self, track_id: int) -> str:
@@ -187,10 +183,10 @@ class IBroadcastClient:
     async def get_full_stream_url(
         self, track_id: int, platform: str = "ibroadcastaio"
     ) -> str:
-        track = self.get_track(track_id)
+        track = await self.get_track(track_id)
 
         return (
-            f'{self.get_stream_url()}{track["file"]}?'
+            f'{await self.get_stream_url()}{track["file"]}?'
             f'&Signature={self._status["user"]["token"]}'
             f"&file_id={track_id}"
             f'&user_id={self._status["user"]["id"]}'

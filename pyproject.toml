@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ibroadcastaio"
-version = "0.2.0"
+version = "0.3.0"
 description = "Client for async communication with the iBroadcast api."
 authors = ["Rob Sonke <rob@tigrou.nl>"]
 license = "MIT"
