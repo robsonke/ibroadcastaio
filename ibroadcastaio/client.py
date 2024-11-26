@@ -1,6 +1,6 @@
 import importlib.metadata
-import json
-from typing import Any, AsyncGenerator
+import logging
+from typing import Any, AsyncGenerator, Dict
 
 from aiohttp import ClientSession
 
@@ -10,20 +10,18 @@ from ibroadcastaio.const import BASE_API_URL, BASE_LIBRARY_URL, REFERER, STATUS_
 class IBroadcastClient:
     """iBroadcast API Client to use the API in an async manner"""
 
-    _albums = None
-    _artists = None
-    _playlists = None
-    _tags = None
-    _tracks = None
-
-    _settings = None
-    _status = None
-
     def __init__(self, http_session: ClientSession) -> None:
         """Main constructor"""
         self.http_session = http_session
+        self._albums = None
+        self._artists = None
+        self._playlists = None
+        self._tags = None
+        self._tracks = None
+        self._settings = None
+        self._status = None
 
-    async def login(self, username: str, password: str) -> dict[str, Any]:
+    async def login(self, username: str, password: str) -> Dict[str, Any]:
         """Login to the iBroadcast API and return the status dict"""
         data = {
             "mode": "status",
@@ -41,26 +39,19 @@ class IBroadcastClient:
                 data,
             )
         except Exception as e:
+            logging.error(f"Failed to login: {e}")
             raise ValueError(f"Failed to login: {e}")
 
         if "user" not in self._status:
             raise ValueError("Invalid credentials")
 
-        # result: Bool
-        # authenticated: Bool
-        # token: String
-        # status: Dictionary
-        # user: Dictionary
-        # settings: Dictionary
-        # status["user"]["token"]
-        # status["user"]["id"]
-
         return self._status
 
     def get_version(self) -> str:
+        """Get the version of the ibroadcastaio package"""
         return importlib.metadata.version("ibroadcastaio")
 
-    async def refresh_library(self):
+    async def refresh_library(self) -> None:
         """Fetch the library to cache it locally"""
         data = {
             "_token": self._status["user"]["token"],
@@ -150,7 +141,6 @@ class IBroadcastClient:
 
     async def get_album_artwork_url(self, album_id: int) -> str:
         """Get the artwork URL for an album from the first track in the album with a valid artwork_id"""
-
         track_id = None
         for track_id in (await self.get_album(album_id))["tracks"]:
             if (await self.get_track(track_id))["artwork_id"] is not None:
@@ -158,15 +148,19 @@ class IBroadcastClient:
         return await self.get_track_artwork_url(track_id)
 
     async def get_track_artwork_url(self, track_id: int) -> str:
+        """Get the artwork URL for a track"""
         return await self.get_artwork_url(track_id, "track")
 
     async def get_artist_artwork_url(self, artist_id: int) -> str:
+        """Get the artwork URL for an artist"""
         return await self.get_artwork_url(artist_id, "artist")
 
     async def get_playlist_artwork_url(self, playlist_id: int) -> str:
+        """Get the artwork URL for a playlist"""
         return await self.get_artwork_url(playlist_id, "playlist")
 
     async def get_artwork_base_url(self) -> str:
+        """Get the base URL for artwork"""
         self._check_library_loaded()
         base_url = self._settings.get("artwork_server")
         if not base_url:
@@ -174,6 +168,7 @@ class IBroadcastClient:
         return base_url
 
     async def get_stream_url(self) -> str:
+        """Get the base URL for streaming"""
         self._check_library_loaded()
         stream_url = self._settings.get("streaming_server")
         if not stream_url:
@@ -183,8 +178,8 @@ class IBroadcastClient:
     async def get_full_stream_url(
         self, track_id: int, platform: str = "ibroadcastaio"
     ) -> str:
+        """Get the full stream URL for a track"""
         track = await self.get_track(track_id)
-
         return (
             f'{await self.get_stream_url()}{track["file"]}?'
             f'&Signature={self._status["user"]["token"]}'
@@ -195,10 +190,12 @@ class IBroadcastClient:
         )
 
     async def get_artist(self, artist_id: int):
+        """Get an artist by ID"""
         self._check_library_loaded()
         return self._artists.get(artist_id)
 
     async def get_artists(self):
+        """Get all artists"""
         self._check_library_loaded()
         return self._artists
 
@@ -239,14 +236,11 @@ class IBroadcastClient:
         return self._playlists
 
     async def __post(
-        self,
-        url: str,
-        headers: dict[str, Any] | None = None,
-        data: dict[str, Any] | None = None,
-    ):
-        async with self.http_session.post(
-            url=url, data=json.dumps(data), headers=headers
-        ) as response:
+        self, url: str, headers: Dict[str, Any], data: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        """Make a POST request and return the response as a dictionary"""
+        async with self.http_session.post(url, headers=headers, json=data) as response:
+            response.raise_for_status()
             return await response.json()
 
     async def __jsonToDict(
@@ -318,7 +312,7 @@ class IBroadcastClient:
                 result[main_key] = int(key)
                 yield result
 
-    def _check_library_loaded(self):
+    def _check_library_loaded(self) -> None:
         """Check if the library is loaded"""
         if self._settings is None:
             raise ValueError("Library not loaded. Please call refresh_library first.")
