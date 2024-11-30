@@ -8,7 +8,6 @@ from ibroadcastaio.client import IBroadcastClient
 
 
 class TestIBroadcastClient(unittest.IsolatedAsyncioTestCase):
-
     async def asyncSetUp(self):
         self.session = ClientSession()
         self.client = IBroadcastClient(self.session)
@@ -24,7 +23,7 @@ class TestIBroadcastClient(unittest.IsolatedAsyncioTestCase):
     async def _load_mock_library(self, identifier: str):
         result = {}
         data = await self._load_raw_mock_library()
-        async for item in self.client._IBroadcastClient__jsonToDict(data, identifier):
+        async for item in self.client._IBroadcastClient__json_to_dict(data, identifier):
             result[item[identifier]] = item
         return result
 
@@ -104,7 +103,7 @@ class TestIBroadcastClient(unittest.IsolatedAsyncioTestCase):
         }
 
         result = []
-        async for item in self.client._IBroadcastClient__jsonToDict(data, "album_id"):
+        async for item in self.client._IBroadcastClient__json_to_dict(data, "album_id"):
             result.append(item)
 
         self.assertEqual(result[0], expected_result)

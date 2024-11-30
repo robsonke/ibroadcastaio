@@ -40,7 +40,7 @@ class IBroadcastClient:
             )
         except Exception as e:
             logging.error(f"Failed to login: {e}")
-            raise ValueError(f"Failed to login: {e}")
+            raise ValueError(f"Failed to login: {e}") from e
 
         if "user" not in self._status:
             raise ValueError("Invalid credentials")
@@ -73,21 +73,21 @@ class IBroadcastClient:
 
         self._albums = {
             album["album_id"]: album
-            async for album in self.__jsonToDict(
+            async for album in self.__json_to_dict(
                 library["library"]["albums"], "album_id"
             )
         }
 
         self._artists = {
             artist["artist_id"]: artist
-            async for artist in self.__jsonToDict(
+            async for artist in self.__json_to_dict(
                 library["library"]["artists"], "artist_id"
             )
         }
 
         self._playlists = {
             playlist["playlist_id"]: playlist
-            async for playlist in self.__jsonToDict(
+            async for playlist in self.__json_to_dict(
                 library["library"]["playlists"], "playlist_id"
             )
         }
@@ -101,12 +101,14 @@ class IBroadcastClient:
         else:
             self._tags = {
                 tag["tag_id"]: tag
-                async for tag in self.__jsonToDict(library["library"]["tags"], "tag_id")
+                async for tag in self.__json_to_dict(
+                    library["library"]["tags"], "tag_id"
+                )
             }
 
         self._tracks = {
             track["track_id"]: track
-            async for track in self.__jsonToDict(
+            async for track in self.__json_to_dict(
                 library["library"]["tracks"], "track_id"
             )
         }
@@ -243,7 +245,7 @@ class IBroadcastClient:
             response.raise_for_status()
             return await response.json()
 
-    async def __jsonToDict(
+    async def __json_to_dict(
         self, data: list[dict[str, Any]], main_key: str
     ) -> AsyncGenerator[dict[str, Any], None]:
         """
