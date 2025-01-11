@@ -13,13 +13,13 @@ class IBroadcastClient:
     def __init__(self, http_session: ClientSession) -> None:
         """Main constructor"""
         self.http_session = http_session
-        self._albums = None
-        self._artists = None
-        self._playlists = None
-        self._tags = None
-        self._tracks = None
-        self._settings = None
-        self._status = None
+        self._albums: Dict[int, Any] = {}
+        self._artists: Dict[int, Any] = {}
+        self._playlists: Dict[int, Any] = {}
+        self._tags: Dict[int, Any] = {}
+        self._tracks: Dict[int, Any] = {}
+        self._settings: Dict[str, Any] = {}
+        self._status: Dict[str, Any] = {}
 
     async def login(self, username: str, password: str) -> Dict[str, Any]:
         """Login to the iBroadcast API and return the status dict"""
@@ -53,7 +53,7 @@ class IBroadcastClient:
 
     async def refresh_library(self) -> None:
         """Fetch the library to cache it locally"""
-        data = {
+        data: Dict[str, Any] = {
             "_token": self._status["user"]["token"],
             "_userid": self._status["user"]["id"],
             "client": REFERER,
@@ -191,49 +191,49 @@ class IBroadcastClient:
             f"&version={self.get_version()}"
         )
 
-    async def get_artist(self, artist_id: int):
+    async def get_artist(self, artist_id: int) -> Dict[str, Any]:
         """Get an artist by ID"""
         self._check_library_loaded()
-        return self._artists.get(artist_id)
+        return self._artists.get(artist_id, {})
 
-    async def get_artists(self):
+    async def get_artists(self) -> Dict[int, Any]:
         """Get all artists"""
         self._check_library_loaded()
         return self._artists
 
-    async def get_tag(self, tag_id: int):
+    async def get_tag(self, tag_id: int) -> Dict[str, Any]:
         self._check_library_loaded()
-        return self._tags.get(tag_id)
+        return self._tags.get(tag_id, {})
 
-    async def get_tags(self):
+    async def get_tags(self) -> Dict[int, Any]:
         self._check_library_loaded()
         return self._tags
 
-    async def get_settings(self):
+    async def get_settings(self) -> Dict[str, Any]:
         self._check_library_loaded()
         return self._settings
 
-    async def get_album(self, album_id: int):
+    async def get_album(self, album_id: int) -> Dict[str, Any]:
         self._check_library_loaded()
-        return self._albums.get(album_id)
+        return self._albums.get(album_id, {})
 
-    async def get_albums(self):
+    async def get_albums(self) -> Dict[int, Any]:
         self._check_library_loaded()
         return self._albums
 
-    async def get_track(self, track_id: int):
+    async def get_track(self, track_id: int) -> Dict[str, Any]:
         self._check_library_loaded()
-        return self._tracks.get(track_id)
+        return self._tracks.get(track_id, {})
 
-    async def get_tracks(self):
+    async def get_tracks(self) -> Dict[int, Any]:
         self._check_library_loaded()
         return self._tracks
 
-    async def get_playlist(self, playlist_id: int):
+    async def get_playlist(self, playlist_id: int) -> Dict[str, Any]:
         self._check_library_loaded()
-        return self._playlists.get(playlist_id)
+        return self._playlists.get(playlist_id, {})
 
-    async def get_playlists(self):
+    async def get_playlists(self) -> Dict[int, Any]:
         self._check_library_loaded()
         return self._playlists
 
@@ -303,7 +303,11 @@ class IBroadcastClient:
             }
         }
         """
-        if "map" not in data or type(data["map"]) is not dict:
+        if (
+            not isinstance(data, dict)
+            or "map" not in data
+            or not isinstance(data["map"], dict)
+        ):
             return
 
         keymap = {v: k for (k, v) in data["map"].items() if not isinstance(v, dict)}

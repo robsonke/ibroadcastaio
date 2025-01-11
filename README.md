@@ -1,5 +1,7 @@
 # iBroadcastAIO
 
+[![Upload the iBroadcastAIO Package to PyPI when a Release is created](https://github.com/robsonke/ibroadcastaio/actions/workflows/publish.yml/badge.svg)](https://github.com/robsonke/ibroadcastaio/actions/workflows/publish.yml)
+
 A Python library inspired by [ibroadcast-python](https://github.com/ctrueden/ibroadcast-python) for interacting with the iBroadcast API in an async manner.
 This library is initially built for usage in an iBroadcast music provider in [Music Assistant](https://music-assistant.io/).
 

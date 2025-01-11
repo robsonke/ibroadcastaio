@@ -1,6 +1,6 @@
 import json
 import unittest
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock, Mock, patch
 
 from aiohttp import ClientSession
 
@@ -8,22 +8,22 @@ from ibroadcastaio.client import IBroadcastClient
 
 
 class TestIBroadcastClient(unittest.IsolatedAsyncioTestCase):
-    async def asyncSetUp(self):
+    async def asyncSetUp(self) -> None:
         self.session = ClientSession()
         self.client = IBroadcastClient(self.session)
         self.client._status = {"user": {"token": "fake_token", "id": "fake_id"}}
 
-    async def asyncTearDown(self):
+    async def asyncTearDown(self) -> None:
         await self.session.close()
 
-    async def _load_raw_mock_library(self):
+    async def _load_raw_mock_library(self) -> dict:
         with open("tests/example.json", "r") as file:
             return json.load(file)
 
-    async def _load_mock_library(self, identifier: str):
+    async def _load_mock_library(self, identifier: str) -> dict:
         result = {}
         data = await self._load_raw_mock_library()
-        async for item in self.client._IBroadcastClient__json_to_dict(data, identifier):
+        async for item in self.client._IBroadcastClient__json_to_dict(data, identifier):  # type: ignore
             result[item[identifier]] = item
         return result
 
@@ -31,7 +31,7 @@ class TestIBroadcastClient(unittest.IsolatedAsyncioTestCase):
         "ibroadcastaio.client.IBroadcastClient._IBroadcastClient__post",
         new_callable=AsyncMock,
     )
-    async def test_login_success(self, mock_post):
+    async def test_login_success(self, mock_post: Mock) -> None:
         mock_post.return_value = {"user": {"token": "fake_token", "id": "fake_id"}}
         result = await self.client.login("test@example.com", "password")
         self.assertEqual(self.client._status["user"]["token"], "fake_token")
@@ -42,7 +42,7 @@ class TestIBroadcastClient(unittest.IsolatedAsyncioTestCase):
         "ibroadcastaio.client.IBroadcastClient._IBroadcastClient__post",
         new_callable=AsyncMock,
     )
-    async def test_login_failure(self, mock_post):
+    async def test_login_failure(self, mock_post: Mock) -> None:
         mock_post.return_value = {}
         with self.assertRaises(ValueError):
             await self.client.login("test@example.com", "password")
@@ -51,7 +51,7 @@ class TestIBroadcastClient(unittest.IsolatedAsyncioTestCase):
         "ibroadcastaio.client.IBroadcastClient._IBroadcastClient__post",
         new_callable=AsyncMock,
     )
-    async def test_refresh_library(self, mock_post):
+    async def test_refresh_library(self, mock_post: Mock) -> None:
         mock_library = await self._load_raw_mock_library()
         mock_post.return_value = mock_library
 
@@ -63,7 +63,7 @@ class TestIBroadcastClient(unittest.IsolatedAsyncioTestCase):
         self.assertIsInstance(self.client._tracks, dict)
         self.assertIsInstance(self.client._settings, dict)
 
-    async def test_json_to_dict(self):
+    async def test_json_to_dict(self) -> None:
         data = {
             "12345": [
                 "My album",
@@ -103,7 +103,7 @@ class TestIBroadcastClient(unittest.IsolatedAsyncioTestCase):
         }
 
         result = []
-        async for item in self.client._IBroadcastClient__json_to_dict(data, "album_id"):
+        async for item in self.client._IBroadcastClient__json_to_dict(data, "album_id"):  # type: ignore
             result.append(item)
 
         self.assertEqual(result[0], expected_result)
@@ -112,7 +112,7 @@ class TestIBroadcastClient(unittest.IsolatedAsyncioTestCase):
         "ibroadcastaio.client.IBroadcastClient._IBroadcastClient__post",
         new_callable=AsyncMock,
     )
-    async def test_get_albums(self, mock_post):
+    async def test_get_albums(self, mock_post: Mock) -> None:
         mock_post.return_value = await self._load_raw_mock_library()
 
         await self.client.refresh_library()
@@ -128,7 +128,7 @@ class TestIBroadcastClient(unittest.IsolatedAsyncioTestCase):
         "ibroadcastaio.client.IBroadcastClient._IBroadcastClient__post",
         new_callable=AsyncMock,
     )
-    async def test_get_settings(self, mock_post):
+    async def test_get_settings(self, mock_post: Mock) -> None:
         mock_library = await self._load_raw_mock_library()
         mock_post.return_value = mock_library
 
@@ -142,7 +142,7 @@ class TestIBroadcastClient(unittest.IsolatedAsyncioTestCase):
         "ibroadcastaio.client.IBroadcastClient._IBroadcastClient__post",
         new_callable=AsyncMock,
     )
-    async def test_get_album(self, mock_post):
+    async def test_get_album(self, mock_post: Mock) -> None:
         mock_raw_library = await self._load_raw_mock_library()
         mock_post.return_value = mock_raw_library
 
@@ -157,7 +157,7 @@ class TestIBroadcastClient(unittest.IsolatedAsyncioTestCase):
         "ibroadcastaio.client.IBroadcastClient._IBroadcastClient__post",
         new_callable=AsyncMock,
     )
-    async def test_get_track(self, mock_post):
+    async def test_get_track(self, mock_post: Mock) -> None:
         mock_raw_library = await self._load_raw_mock_library()
         mock_post.return_value = mock_raw_library
 
@@ -172,22 +172,21 @@ class TestIBroadcastClient(unittest.IsolatedAsyncioTestCase):
         "ibroadcastaio.client.IBroadcastClient._IBroadcastClient__post",
         new_callable=AsyncMock,
     )
-    async def test_get_playlist(self, mock_post):
+    async def test_get_playlist(self, mock_post: Mock) -> None:
         mock_raw_library = await self._load_raw_mock_library()
         mock_post.return_value = mock_raw_library
 
         await self.client.refresh_library()
-        playlist_id = list(mock_raw_library["library"]["playlists"].keys())[0]
-        playlist = await self.client.get_playlist(int(playlist_id))
-
+        playlist_id = int(list(mock_raw_library["library"]["playlists"].keys())[0])
+        playlist = await self.client.get_playlist(playlist_id)
         self.assertIsInstance(playlist, dict)
-        self.assertEqual(playlist["playlist_id"], int(playlist_id))
+        self.assertEqual(playlist["playlist_id"], playlist_id)
 
     @patch(
         "ibroadcastaio.client.IBroadcastClient._IBroadcastClient__post",
         new_callable=AsyncMock,
     )
-    async def test_get_playlists(self, mock_post):
+    async def test_get_playlists(self, mock_post: Mock) -> None:
         mock_post.return_value = await self._load_raw_mock_library()
 
         await self.client.refresh_library()
@@ -203,7 +202,7 @@ class TestIBroadcastClient(unittest.IsolatedAsyncioTestCase):
         "ibroadcastaio.client.IBroadcastClient._IBroadcastClient__post",
         new_callable=AsyncMock,
     )
-    async def test_get_artist(self, mock_post):
+    async def test_get_artist(self, mock_post: Mock) -> None:
         mock_raw_library = await self._load_raw_mock_library()
         mock_post.return_value = mock_raw_library
 
@@ -218,7 +217,7 @@ class TestIBroadcastClient(unittest.IsolatedAsyncioTestCase):
         "ibroadcastaio.client.IBroadcastClient._IBroadcastClient__post",
         new_callable=AsyncMock,
     )
-    async def test_get_artists(self, mock_post):
+    async def test_get_artists(self, mock_post: Mock) -> None:
         mock_post.return_value = await self._load_raw_mock_library()
 
         await self.client.refresh_library()
@@ -234,7 +233,7 @@ class TestIBroadcastClient(unittest.IsolatedAsyncioTestCase):
         "ibroadcastaio.client.IBroadcastClient._IBroadcastClient__post",
         new_callable=AsyncMock,
     )
-    async def test_get_tag(self, mock_post):
+    async def test_get_tag(self, mock_post: Mock) -> None:
         mock_raw_library = await self._load_raw_mock_library()
         mock_post.return_value = mock_raw_library
 
@@ -249,7 +248,7 @@ class TestIBroadcastClient(unittest.IsolatedAsyncioTestCase):
         "ibroadcastaio.client.IBroadcastClient._IBroadcastClient__post",
         new_callable=AsyncMock,
     )
-    async def test_get_tags(self, mock_post):
+    async def test_get_tags(self, mock_post: Mock) -> None:
         mock_post.return_value = await self._load_raw_mock_library()
 
         await self.client.refresh_library()
@@ -265,7 +264,7 @@ class TestIBroadcastClient(unittest.IsolatedAsyncioTestCase):
         "ibroadcastaio.client.IBroadcastClient._IBroadcastClient__post",
         new_callable=AsyncMock,
     )
-    async def test_get_tracks(self, mock_post):
+    async def test_get_tracks(self, mock_post: Mock) -> None:
         mock_post.return_value = await self._load_raw_mock_library()
 
         await self.client.refresh_library()
@@ -281,7 +280,7 @@ class TestIBroadcastClient(unittest.IsolatedAsyncioTestCase):
         "ibroadcastaio.client.IBroadcastClient._IBroadcastClient__post",
         new_callable=AsyncMock,
     )
-    async def test_get_artwork_base_url(self, mock_post):
+    async def test_get_artwork_base_url(self, mock_post: Mock) -> None:
         mock_library = await self._load_raw_mock_library()
         mock_post.return_value = mock_library
 
@@ -295,7 +294,7 @@ class TestIBroadcastClient(unittest.IsolatedAsyncioTestCase):
         "ibroadcastaio.client.IBroadcastClient._IBroadcastClient__post",
         new_callable=AsyncMock,
     )
-    async def test_get_artwork_base_url_not_found(self, mock_post):
+    async def test_get_artwork_base_url_not_found(self, mock_post: Mock) -> None:
         mock_library = await self._load_raw_mock_library()
         mock_library["settings"].pop("artwork_server", None)
         mock_post.return_value = mock_library
@@ -308,7 +307,7 @@ class TestIBroadcastClient(unittest.IsolatedAsyncioTestCase):
         "ibroadcastaio.client.IBroadcastClient._IBroadcastClient__post",
         new_callable=AsyncMock,
     )
-    async def test_get_stream_url(self, mock_post):
+    async def test_get_stream_url(self, mock_post: Mock) -> None:
         mock_library = await self._load_raw_mock_library()
         mock_post.return_value = mock_library
 
@@ -322,7 +321,7 @@ class TestIBroadcastClient(unittest.IsolatedAsyncioTestCase):
         "ibroadcastaio.client.IBroadcastClient._IBroadcastClient__post",
         new_callable=AsyncMock,
     )
-    async def test_get_stream_url_not_found(self, mock_post):
+    async def test_get_stream_url_not_found(self, mock_post: Mock) -> None:
         mock_library = await self._load_raw_mock_library()
         mock_library["settings"].pop("streaming_server", None)
         mock_post.return_value = mock_library
@@ -335,7 +334,7 @@ class TestIBroadcastClient(unittest.IsolatedAsyncioTestCase):
         "ibroadcastaio.client.IBroadcastClient.get_artwork_url",
         new_callable=AsyncMock,
     )
-    async def test_get_track_artwork_url(self, mock_get_artwork_url):
+    async def test_get_track_artwork_url(self, mock_get_artwork_url: Mock) -> None:
         track_id = 123
         expected_url = "http://example.com/artwork/123-300"
         mock_get_artwork_url.return_value = expected_url
@@ -349,7 +348,9 @@ class TestIBroadcastClient(unittest.IsolatedAsyncioTestCase):
         "ibroadcastaio.client.IBroadcastClient.get_artwork_url",
         new_callable=AsyncMock,
     )
-    async def test_get_track_artwork_url_no_artwork(self, mock_get_artwork_url):
+    async def test_get_track_artwork_url_no_artwork(
+        self, mock_get_artwork_url: Mock
+    ) -> None:
         track_id = 123
         mock_get_artwork_url.side_effect = ValueError(
             "No artwork found for track with id 123"
@@ -372,8 +373,11 @@ class TestIBroadcastClient(unittest.IsolatedAsyncioTestCase):
         new_callable=AsyncMock,
     )
     async def test_get_artwork_url_artist(
-        self, mock_check_library_loaded, mock_get_artwork_base_url, mock_get_artist
-    ):
+        self,
+        mock_check_library_loaded: Mock,
+        mock_get_artwork_base_url: Mock,
+        mock_get_artist: Mock,
+    ) -> None:
         mock_get_artwork_base_url.return_value = "http://example.com"
         mock_get_artist.return_value = {"artist_id": 1, "artwork_id": 123}
         mock_check_library_loaded.return_value = True
@@ -397,8 +401,11 @@ class TestIBroadcastClient(unittest.IsolatedAsyncioTestCase):
         new_callable=AsyncMock,
     )
     async def test_get_artwork_url_playlist(
-        self, mock_check_library_loaded, mock_get_artwork_base_url, mock_get_playlist
-    ):
+        self,
+        mock_check_library_loaded: Mock,
+        mock_get_artwork_base_url: Mock,
+        mock_get_playlist: Mock,
+    ) -> None:
         mock_get_artwork_base_url.return_value = "http://example.com"
         mock_get_playlist.return_value = {"playlist_id": 1, "artwork_id": 123}
         mock_check_library_loaded.return_value = True
@@ -422,8 +429,11 @@ class TestIBroadcastClient(unittest.IsolatedAsyncioTestCase):
         new_callable=AsyncMock,
     )
     async def test_get_artwork_url_track(
-        self, mock_check_library_loaded, mock_get_artwork_base_url, mock_get_track
-    ):
+        self,
+        mock_check_library_loaded: Mock,
+        mock_get_artwork_base_url: Mock,
+        mock_get_track: Mock,
+    ) -> None:
         mock_get_artwork_base_url.return_value = "http://example.com"
         mock_get_track.return_value = {"track_id": 1, "artwork_id": 123}
         mock_check_library_loaded.return_value = True
@@ -434,7 +444,7 @@ class TestIBroadcastClient(unittest.IsolatedAsyncioTestCase):
         mock_get_artwork_base_url.assert_awaited_once()
         mock_get_track.assert_awaited_once_with(1)
 
-    async def test_get_artwork_url_invalid_entity_type(self):
+    async def test_get_artwork_url_invalid_entity_type(self) -> None:
         with self.assertRaises(ValueError):
             await self.client.get_artwork_url(1, "invalid_type")
 
@@ -447,8 +457,8 @@ class TestIBroadcastClient(unittest.IsolatedAsyncioTestCase):
         new_callable=AsyncMock,
     )
     async def test_get_artwork_url_no_artwork(
-        self, mock_check_library_loaded, mock_get_artist
-    ):
+        self, mock_check_library_loaded: Mock, mock_get_artist: Mock
+    ) -> None:
         mock_get_artist.return_value = {"artist_id": 1}
         mock_check_library_loaded.return_value = True
 

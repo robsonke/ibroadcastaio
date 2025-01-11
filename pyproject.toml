@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ibroadcastaio"
-version = "0.3.1"
+version = "0.4.0"
 description = "Client for async communication with the iBroadcast api."
 authors = ["Rob Sonke <rob@tigrou.nl>"]
 license = "MIT"
@@ -8,23 +8,21 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.11"
-aiohttp = "^3.10.10"
+aiohttp = "^3.11.0"
 pre-commit = "^4.0.1"
 pylint = "^3.3.1"
-
-[tool.poetry.dev-dependencies]
-pytest = "^6.2.4"
-black = "^24.10.0"
-isort = "^5.13.2"
-flake8 = "^7.1.1"
-ruff = "^0.8.1"
 
 [tool.poetry.scripts]
 example = "example:main"
 test = "unittest:main"
 
 [tool.poetry.group.dev.dependencies]
+pytest = "^6.2.4"
+black = "^24.10.0"
+isort = "^5.13.2"
+flake8 = "^7.1.1"
 ruff = "^0.8.1"
+mypy = "^1.14.1"
 
 [tool.ruff]
 fix = true
@@ -54,3 +52,11 @@ known-first-party = ["ibroadcastaio"]
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.mypy]
+python_version = "3.11"
+check_untyped_defs = true
+disallow_untyped_calls = true
+disallow_untyped_defs = true
+ignore_missing_imports = true
+strict_optional = true
