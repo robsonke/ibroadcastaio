@@ -499,6 +499,30 @@ class TestIBroadcastClient(unittest.IsolatedAsyncioTestCase):
             await self.client.get_album_artwork_url(1)
         self.assertIn("1", str(ctx.exception))
 
+    @patch(
+        "ibroadcastaio.client.IBroadcastClient.get_stream_url",
+        new_callable=AsyncMock,
+    )
+    @patch(
+        "ibroadcastaio.client.IBroadcastClient.get_track",
+        new_callable=AsyncMock,
+    )
+    async def test_get_full_stream_url_format(
+        self, mock_get_track: Mock, mock_get_stream_url: Mock
+    ) -> None:
+        mock_get_stream_url.return_value = "https://stream.example.com"
+        mock_get_track.return_value = {"track_id": 42, "file": "/path/to/file.mp3"}
+
+        result = await self.client.get_full_stream_url(42)
+
+        self.assertNotIn("?&", result)
+        self.assertNotIn("&&", result)
+        self.assertEqual(result.count("?"), 1)
+        self.assertTrue(result.startswith("https://stream.example.com/path/to/file.mp3?"))
+        self.assertIn("Signature=fake_token", result)
+        self.assertIn("file_id=42", result)
+        self.assertIn("user_id=fake_id", result)
+
 
 if __name__ == "__main__":
     unittest.main()

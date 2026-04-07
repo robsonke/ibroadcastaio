@@ -192,8 +192,8 @@ class IBroadcastClient:
         """Get the full stream URL for a track"""
         track = await self.get_track(track_id)
         return (
-            f'{await self.get_stream_url()}{track["file"]}?'
-            f'&Signature={self._status["user"]["token"]}'
+            f'{await self.get_stream_url()}{track["file"]}'
+            f'?Signature={self._status["user"]["token"]}'
             f"&file_id={track_id}"
             f'&user_id={self._status["user"]["id"]}'
             f"&platform={platform}"
