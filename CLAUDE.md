@@ -8,7 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 - Python 3.11+, Poetry-managed
 - Async-first design using `aiohttp`
-- Currently v0.4.0
+- Currently v0.5.0
 
 ## Commands
 
