@@ -27,3 +27,5 @@ share/python-wheels/
 MANIFEST
 example-rob.json
 example.py
+docs/
+.claude/settings.local.json

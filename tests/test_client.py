@@ -475,7 +475,9 @@ class TestIBroadcastClient(unittest.IsolatedAsyncioTestCase):
         "ibroadcastaio.client.IBroadcastClient.get_album",
         new_callable=AsyncMock,
     )
-    async def test_get_album_artwork_url_album_not_found(self, mock_get_album: Mock) -> None:
+    async def test_get_album_artwork_url_album_not_found(
+        self, mock_get_album: Mock
+    ) -> None:
         mock_get_album.return_value = {}
         with self.assertRaises(ValueError) as ctx:
             await self.client.get_album_artwork_url(999)
@@ -518,7 +520,9 @@ class TestIBroadcastClient(unittest.IsolatedAsyncioTestCase):
         self.assertNotIn("?&", result)
         self.assertNotIn("&&", result)
         self.assertEqual(result.count("?"), 1)
-        self.assertTrue(result.startswith("https://stream.example.com/path/to/file.mp3?"))
+        self.assertTrue(
+            result.startswith("https://stream.example.com/path/to/file.mp3?")
+        )
         self.assertIn("Signature=fake_token", result)
         self.assertIn("file_id=42", result)
         self.assertIn("user_id=fake_id", result)
