@@ -143,10 +143,19 @@ class IBroadcastClient:
 
     async def get_album_artwork_url(self, album_id: int) -> str:
         """Get the artwork URL for an album from the first track in the album with a valid artwork_id"""
+        album = await self.get_album(album_id)
+        if not album:
+            raise ValueError(f"Album with id {album_id} not found")
+
         track_id = None
-        for track_id in (await self.get_album(album_id))["tracks"]:
-            if (await self.get_track(track_id))["artwork_id"] is not None:
+        for tid in album["tracks"]:
+            if (await self.get_track(tid))["artwork_id"] is not None:
+                track_id = tid
                 break
+
+        if track_id is None:
+            raise ValueError(f"No artwork found for album with id {album_id}")
+
         return await self.get_track_artwork_url(track_id)
 
     async def get_track_artwork_url(self, track_id: int) -> str:

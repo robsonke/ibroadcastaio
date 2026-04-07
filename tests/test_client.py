@@ -471,6 +471,34 @@ class TestIBroadcastClient(unittest.IsolatedAsyncioTestCase):
         with self.assertRaises(ValueError):
             self.client._check_library_loaded()
 
+    @patch(
+        "ibroadcastaio.client.IBroadcastClient.get_album",
+        new_callable=AsyncMock,
+    )
+    async def test_get_album_artwork_url_album_not_found(self, mock_get_album: Mock) -> None:
+        mock_get_album.return_value = {}
+        with self.assertRaises(ValueError) as ctx:
+            await self.client.get_album_artwork_url(999)
+        self.assertIn("999", str(ctx.exception))
+
+    @patch(
+        "ibroadcastaio.client.IBroadcastClient.get_track",
+        new_callable=AsyncMock,
+    )
+    @patch(
+        "ibroadcastaio.client.IBroadcastClient.get_album",
+        new_callable=AsyncMock,
+    )
+    async def test_get_album_artwork_url_no_tracks_with_artwork(
+        self, mock_get_album: Mock, mock_get_track: Mock
+    ) -> None:
+        mock_get_album.return_value = {"album_id": 1, "tracks": [10, 11]}
+        # All tracks return None for artwork_id
+        mock_get_track.return_value = {"track_id": 10, "artwork_id": None}
+        with self.assertRaises(ValueError) as ctx:
+            await self.client.get_album_artwork_url(1)
+        self.assertIn("1", str(ctx.exception))
+
 
 if __name__ == "__main__":
     unittest.main()
