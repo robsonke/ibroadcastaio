@@ -466,6 +466,11 @@ class TestIBroadcastClient(unittest.IsolatedAsyncioTestCase):
             await self.client.get_artwork_url(1, "artist")
         mock_get_artist.assert_awaited_once_with(1)
 
+    def test_check_library_loaded_raises_when_settings_empty(self) -> None:
+        self.client._settings = {}
+        with self.assertRaises(ValueError):
+            self.client._check_library_loaded()
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -320,5 +320,5 @@ class IBroadcastClient:
 
     def _check_library_loaded(self) -> None:
         """Check if the library is loaded"""
-        if self._settings is None:
+        if not self._settings:
             raise ValueError("Library not loaded. Please call refresh_library first.")
