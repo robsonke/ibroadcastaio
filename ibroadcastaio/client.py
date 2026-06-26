@@ -148,8 +148,8 @@ class IBroadcastClient:
             raise ValueError(f"Album with id {album_id} not found")
 
         track_id = None
-        for tid in album["tracks"]:
-            if (await self.get_track(tid))["artwork_id"] is not None:
+        for tid in album.get("tracks", []):
+            if (await self.get_track(tid)).get("artwork_id") is not None:
                 track_id = tid
                 break
 
@@ -191,6 +191,9 @@ class IBroadcastClient:
     ) -> str:
         """Get the full stream URL for a track"""
         track = await self.get_track(track_id)
+        if not track:
+            raise ValueError(f"Track with id {track_id} not found")
+
         return (
             f'{await self.get_stream_url()}{track["file"]}'
             f'?Signature={self._status["user"]["token"]}'
@@ -203,7 +206,7 @@ class IBroadcastClient:
     async def get_artist(self, artist_id: int) -> Dict[str, Any]:
         """Get an artist by ID"""
         self._check_library_loaded()
-        return self._artists.get(artist_id, {})
+        return self._artists.get(int(artist_id), {})
 
     async def get_artists(self) -> Dict[int, Any]:
         """Get all artists"""
@@ -212,7 +215,7 @@ class IBroadcastClient:
 
     async def get_tag(self, tag_id: int) -> Dict[str, Any]:
         self._check_library_loaded()
-        return self._tags.get(tag_id, {})
+        return self._tags.get(int(tag_id), {})
 
     async def get_tags(self) -> Dict[int, Any]:
         self._check_library_loaded()
@@ -224,7 +227,7 @@ class IBroadcastClient:
 
     async def get_album(self, album_id: int) -> Dict[str, Any]:
         self._check_library_loaded()
-        return self._albums.get(album_id, {})
+        return self._albums.get(int(album_id), {})
 
     async def get_albums(self) -> Dict[int, Any]:
         self._check_library_loaded()
@@ -232,7 +235,9 @@ class IBroadcastClient:
 
     async def get_track(self, track_id: int) -> Dict[str, Any]:
         self._check_library_loaded()
-        return self._tracks.get(track_id, {})
+        # The caches are int-keyed, but the API references ids as strings in
+        # some payloads (e.g. an album's track list), so normalise the lookup.
+        return self._tracks.get(int(track_id), {})
 
     async def get_tracks(self) -> Dict[int, Any]:
         self._check_library_loaded()
@@ -240,7 +245,7 @@ class IBroadcastClient:
 
     async def get_playlist(self, playlist_id: int) -> Dict[str, Any]:
         self._check_library_loaded()
-        return self._playlists.get(playlist_id, {})
+        return self._playlists.get(int(playlist_id), {})
 
     async def get_playlists(self) -> Dict[int, Any]:
         self._check_library_loaded()

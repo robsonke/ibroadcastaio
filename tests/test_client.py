@@ -172,6 +172,23 @@ class TestIBroadcastClient(unittest.IsolatedAsyncioTestCase):
         "ibroadcastaio.client.IBroadcastClient._IBroadcastClient__post",
         new_callable=AsyncMock,
     )
+    async def test_get_track_with_string_id(self, mock_post: Mock) -> None:
+        # The iBroadcast API references track IDs as strings inside album and
+        # playlist track arrays, while _tracks is keyed by int. get_track must
+        # coerce the lookup so a string id still resolves.
+        mock_raw_library = await self._load_raw_mock_library()
+        mock_post.return_value = mock_raw_library
+
+        await self.client.refresh_library()
+        track_id = list(mock_raw_library["library"]["tracks"].keys())[0]
+        track = await self.client.get_track(track_id)
+
+        self.assertEqual(track["track_id"], int(track_id))
+
+    @patch(
+        "ibroadcastaio.client.IBroadcastClient._IBroadcastClient__post",
+        new_callable=AsyncMock,
+    )
     async def test_get_playlist(self, mock_post: Mock) -> None:
         mock_raw_library = await self._load_raw_mock_library()
         mock_post.return_value = mock_raw_library

@@ -6,9 +6,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **iBroadcastAIO** is an async Python client library for the [iBroadcast API](https://devguide.ibroadcast.com/). It was built primarily for use in [Music Assistant](https://music-assistant.io/) as an iBroadcast music provider.
 
-- Python 3.11+, Poetry-managed
+- Python 3.14+, Poetry-managed
 - Async-first design using `aiohttp`
-- Currently v0.5.0
+- Currently v0.8.0
 
 ## Commands
 
@@ -29,7 +29,7 @@ isort ibroadcastaio tests --profile black
 # Lint
 ruff check ibroadcastaio tests
 flake8 ibroadcastaio tests --max-line-length=160
-mypy ibroadcastaio --python-version=3.11
+mypy ibroadcastaio --python-version=3.14
 
 # Run all pre-commit checks
 pre-commit run --all-files
